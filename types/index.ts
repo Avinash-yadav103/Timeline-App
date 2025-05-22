@@ -53,22 +53,63 @@ export interface Note {
   tags: string[];
 }
 
-export interface Whiteboard {
-  id: string;
-  name: string;
-  elements: WhiteboardElement[];
-  created: Date;
-  updated: Date;
-}
+export type Point = {
+  x: number;
+  y: number;
+};
+
+export type WhiteboardElementType = 
+  | "pen" 
+  | "line" 
+  | "rectangle" 
+  | "ellipse" 
+  | "text" 
+  | "image";
 
 export interface WhiteboardElement {
   id: string;
-  type: "shape" | "text" | "image" | "line";
+  type: WhiteboardElementType;
   x: number;
   y: number;
   width: number;
   height: number;
-  content?: string;
-  style?: Record<string, string>;
+  points?: Point[]; // For pen and line
+  content?: string; // For text
+  style: {
+    strokeColor: string;
+    fillColor: string;
+    strokeWidth: number;
+    opacity: number;
+    fontSize?: number;
+    fontFamily?: string;
+  };
+  rotation?: number;
+  layer: number;
 }
+
+export interface Whiteboard {
+  id: string;
+  name: string;
+  description?: string;
+  elements: WhiteboardElement[];
+  thumbnail?: string;
+  created: Date;
+  updated: Date;
+  createdBy?: string;
+  tags: string[];
+  width: number;
+  height: number;
+  backgroundColor: string;
+}
+
+export type WhiteboardTool = 
+  | "select" 
+  | "pen" 
+  | "line" 
+  | "rectangle" 
+  | "ellipse" 
+  | "text" 
+  | "eraser" 
+  | "hand" // For panning
+  | "image";
 

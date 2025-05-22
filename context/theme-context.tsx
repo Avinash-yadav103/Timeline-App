@@ -1,18 +1,17 @@
 "use client"
 
-import type React from "react"
-
+import * as React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 
-type Theme = "light" | "dark" | "system"
+type Theme = "dark" | "light" | "system"
 
-interface ThemeProviderProps {
+type ThemeProviderProps = {
   children: React.ReactNode
   defaultTheme?: Theme
   storageKey?: string
 }
 
-interface ThemeProviderState {
+type ThemeProviderState = {
   theme: Theme
   setTheme: (theme: Theme) => void
 }
@@ -30,22 +29,33 @@ export function ThemeProvider({
   storageKey = "ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme)
+  const [theme, setTheme] = useState<Theme>(defaultTheme)
+  
+  // Only access localStorage after component has mounted (client-side)
+  useEffect(() => {
+    const savedTheme = localStorage.getItem(storageKey) as Theme
+    if (savedTheme) {
+      setTheme(savedTheme)
+    }
+  }, [storageKey])
 
   useEffect(() => {
     const root = window.document.documentElement
+    
     root.classList.remove("light", "dark")
-
+    
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      
       root.classList.add(systemTheme)
       return
     }
-
+    
     root.classList.add(theme)
   }, [theme])
-
+  
   const value = {
     theme,
     setTheme: (theme: Theme) => {
@@ -64,7 +74,8 @@ export function ThemeProvider({
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext)
 
-  if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider")
+  if (context === undefined)
+    throw new Error("useTheme must be used within a ThemeProvider")
 
   return context
 }

@@ -1,17 +1,27 @@
 "use client"
 
 import * as React from "react"
+import { useWhiteboardStore } from "@/store/whiteboard-store"
 import { useWorkspace } from "@/hooks/use-workspace"
 import { WorkspaceSidebar } from "@/components/workspace-sidebar"
 import { ProjectTimeline } from "@/components/project-timeline"
 import { CalendarView } from "@/components/calendar-view"
+import { WhiteboardDashboard } from "@/components/whiteboard/whiteboard-dashboard" 
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function WorkspaceDashboard() {
+  const router = useRouter();
   const { currentProject, currentView } = useWorkspace()
+  const { whiteboards, createWhiteboard } = useWhiteboardStore()
   
+  const handleNewWhiteboard = () => {
+    const whiteboard = createWhiteboard("Untitled Whiteboard");
+    router.push(`/whiteboard/${whiteboard.id}`);
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case "timeline":
@@ -45,12 +55,14 @@ export function WorkspaceDashboard() {
           </div>
         )
       case "whiteboard":
-        return (
+        return whiteboards.length > 0 ? (
+          <WhiteboardDashboard />
+        ) : (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-2">Whiteboard</h2>
               <p className="text-muted-foreground mb-4">Create diagrams and collaborate visually</p>
-              <Button>
+              <Button onClick={handleNewWhiteboard}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 New Whiteboard
               </Button>

@@ -1,0 +1,1 @@
+export { useWhiteboard } from "@/context/whiteboard-context";
