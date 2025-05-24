@@ -7,14 +7,15 @@ import {
   Pencil, 
   Type, 
   MousePointer, 
-  Image, 
+  Image as ImageIcon, 
   Eraser,
   Minus,
   Undo2,
   Redo2,
   Trash2,
   Download,
-  Save
+  Save,
+  Hand
 } from "lucide-react";
 import { useWhiteboardStore } from "@/store/whiteboard-store";
 import { ColorPalette } from "./color-palette";
@@ -52,19 +53,20 @@ export function WhiteboardToolbar({
   
   const tools = [
     { id: "select" as Tool, icon: <MousePointer size={16} />, label: "Select" },
+    { id: "hand" as Tool, icon: <Hand size={16} />, label: "Hand Tool" },
     { id: "pen" as Tool, icon: <Pencil size={16} />, label: "Pen" },
     { id: "line" as Tool, icon: <Minus size={16} />, label: "Line" },
     { id: "rectangle" as Tool, icon: <Square size={16} />, label: "Rectangle" },
     { id: "ellipse" as Tool, icon: <Circle size={16} />, label: "Ellipse" },
     { id: "text" as Tool, icon: <Type size={16} />, label: "Text" },
     { id: "eraser" as Tool, icon: <Eraser size={16} />, label: "Eraser" },
-    { id: "image" as Tool, icon: <Image size={16} />, label: "Image" },
+    { id: "image" as Tool, icon: <ImageIcon size={16} />, label: "Image" },
   ];
   
   return (
-    <div className="flex flex-col gap-2 p-2 rounded-lg shadow-md bg-background border border-border">
+    <div className="fixed left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 p-2 rounded-lg shadow-md bg-background border border-border">
       {/* Drawing tools */}
-      <div className="grid grid-cols-2 gap-1">
+      <div className="grid grid-cols-1 gap-1">
         {tools.map((tool) => (
           <ToolbarItem
             key={tool.id}
@@ -104,7 +106,7 @@ export function WhiteboardToolbar({
       {/* Actions */}
       <div className="flex flex-col gap-1">
         <div className="text-xs text-muted-foreground">Actions</div>
-        <div className="flex gap-1 flex-wrap">
+        <div className="grid grid-cols-2 gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button

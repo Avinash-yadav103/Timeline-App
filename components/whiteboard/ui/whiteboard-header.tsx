@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Share2 } from "lucide-react";
 
 interface WhiteboardHeaderProps {
   name: string;
   onNameChange: (name: string) => void;
   onBack: () => void;
+  onShare?: () => void;
 }
 
-export function WhiteboardHeader({ name, onNameChange, onBack }: WhiteboardHeaderProps) {
+export function WhiteboardHeader({ name, onNameChange, onBack, onShare }: WhiteboardHeaderProps) {
   const [editing, setEditing] = useState(false);
   const [tempName, setTempName] = useState(name);
   
@@ -20,7 +21,7 @@ export function WhiteboardHeader({ name, onNameChange, onBack }: WhiteboardHeade
   };
   
   return (
-    <div className="flex items-center justify-between border-b border-border p-4">
+    <div className="flex items-center justify-between border-b border-border p-4 bg-background">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft size={16} />
@@ -57,6 +58,15 @@ export function WhiteboardHeader({ name, onNameChange, onBack }: WhiteboardHeade
           >
             {name || "Untitled Whiteboard"}
           </h1>
+        )}
+      </div>
+      
+      <div className="flex items-center gap-2">
+        {onShare && (
+          <Button variant="outline" size="sm" onClick={onShare}>
+            <Share2 size={14} className="mr-2" />
+            Share
+          </Button>
         )}
       </div>
     </div>

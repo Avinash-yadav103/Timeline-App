@@ -9,7 +9,8 @@ import { WhiteboardHeader } from "./ui/whiteboard-header";
 import type { Tool, DrawingStyle } from "@/types/whiteboard-types";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
-import { TooltipProvider } from "@/components/ui/tooltip"; // Add this import
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { WhiteboardTemplatesDialog } from "./ui/whiteboard-templates-dialog";
 
 interface WhiteboardEditorProps {
   id?: string;
@@ -32,6 +33,7 @@ export function WhiteboardEditor({ id }: WhiteboardEditorProps) {
     opacity: 1
   });
   const [name, setName] = useState("");
+  const [showTemplates, setShowTemplates] = useState(false);
   
   // Initialize whiteboard
   useEffect(() => {
@@ -45,11 +47,10 @@ export function WhiteboardEditor({ id }: WhiteboardEditorProps) {
         router.push("/whiteboard/new");
       }
     } else {
-      // New whiteboard
-      const newWhiteboard = createWhiteboard("Untitled Whiteboard");
-      router.replace(`/whiteboard/${newWhiteboard.id}`);
+      // New whiteboard - show templates dialog
+      setShowTemplates(true);
     }
-  }, [id, createWhiteboard, getWhiteboard, router]);
+  }, [id, getWhiteboard, router]);
   
   const handleNameChange = useCallback((newName: string) => {
     setName(newName);
@@ -84,9 +85,6 @@ export function WhiteboardEditor({ id }: WhiteboardEditorProps) {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // TODO: Render all elements on this canvas
-    // This would be similar to the renderElements function in WhiteboardCanvas
-    
     // Download the canvas as an image
     const link = document.createElement('a');
     link.download = `${currentWhiteboard.name.replace(/\s+/g, '-')}.png`;
@@ -99,6 +97,18 @@ export function WhiteboardEditor({ id }: WhiteboardEditorProps) {
     });
   }, [currentWhiteboard, toast]);
   
+  const handleCreateFromTemplate = useCallback((templateName: string) => {
+    const newWhiteboard = createWhiteboard(templateName || "Untitled Whiteboard");
+    router.replace(`/whiteboard/${newWhiteboard.id}`);
+    setShowTemplates(false);
+  }, [createWhiteboard, router]);
+  
+  const handleSkipTemplate = useCallback(() => {
+    const newWhiteboard = createWhiteboard("Untitled Whiteboard");
+    router.replace(`/whiteboard/${newWhiteboard.id}`);
+    setShowTemplates(false);
+  }, [createWhiteboard, router]);
+  
   if (!currentWhiteboard && id) {
     return (
       <div className="flex h-full w-full items-center justify-center">
@@ -109,7 +119,6 @@ export function WhiteboardEditor({ id }: WhiteboardEditorProps) {
     );
   }
 
-  // Wrap the entire component with TooltipProvider
   return (
     <TooltipProvider>
       <div className="flex h-full w-full flex-col">
@@ -117,30 +126,34 @@ export function WhiteboardEditor({ id }: WhiteboardEditorProps) {
           name={name} 
           onNameChange={handleNameChange} 
           onBack={() => router.push("/whiteboard")}
+          onShare={() => toast({ title: "Share feature coming soon" })}
         />
         
-        <div className="flex flex-1 overflow-hidden">
-          <div className="flex-shrink-0">
-            <WhiteboardToolbar 
-              currentTool={currentTool}
-              setCurrentTool={setCurrentTool}
-              strokeColor={currentStyle.strokeColor}
-              setStrokeColor={(color) => setCurrentStyle(prev => ({ ...prev, strokeColor: color }))}
-              strokeWidth={currentStyle.strokeWidth}
-              setStrokeWidth={(width) => setCurrentStyle(prev => ({ ...prev, strokeWidth: width }))}
-              onSave={handleSave}
-              onExport={handleExport}
-            />
-          </div>
+        <div className="flex flex-1 overflow-hidden relative">
+          <WhiteboardToolbar 
+            currentTool={currentTool}
+            setCurrentTool={setCurrentTool}
+            strokeColor={currentStyle.strokeColor}
+            setStrokeColor={(color) => setCurrentStyle(prev => ({ ...prev, strokeColor: color }))}
+            strokeWidth={currentStyle.strokeWidth}
+            setStrokeWidth={(width) => setCurrentStyle(prev => ({ ...prev, strokeWidth: width }))}
+            onSave={handleSave}
+            onExport={handleExport}
+          />
           
-          <div className="flex-1 p-4">
-            <div className="h-full w-full rounded-lg border border-border overflow-hidden shadow-lg">
-              {currentWhiteboard && (
-                <WhiteboardCanvas whiteboardId={currentWhiteboard.id} />
-              )}
-            </div>
+          <div className="flex-1">
+            {currentWhiteboard && (
+              <WhiteboardCanvas whiteboardId={currentWhiteboard.id} />
+            )}
           </div>
         </div>
+        
+        <WhiteboardTemplatesDialog 
+          open={showTemplates}
+          onOpenChange={setShowTemplates}
+          onSelectTemplate={handleCreateFromTemplate}
+          onSkip={handleSkipTemplate}
+        />
         
         <Toaster />
       </div>

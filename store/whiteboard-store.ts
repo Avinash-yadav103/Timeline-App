@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
-import type { DrawingElement, WhiteboardAction, WhiteboardData } from "@/types/whiteboard-types";
+import type { DrawingElement, WhiteboardData } from "@/types/whiteboard-types";
 
 interface WhiteboardStore {
   whiteboards: WhiteboardData[];
@@ -51,8 +51,8 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
         set((state) => ({
           whiteboards: [...state.whiteboards, newWhiteboard],
           currentWhiteboard: newWhiteboard,
-          history: [],
-          historyIndex: -1,
+          history: [[]],
+          historyIndex: 0,
         }));
         
         return newWhiteboard;
@@ -87,20 +87,24 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
         }
         
         const whiteboard = get().whiteboards.find(wb => wb.id === id);
-        set({ 
-          currentWhiteboard: whiteboard || null,
-          history: whiteboard ? [whiteboard.elements] : [],
-          historyIndex: 0
-        });
+        if (whiteboard) {
+          set({ 
+            currentWhiteboard: whiteboard,
+            history: [whiteboard.elements || []],
+            historyIndex: 0
+          });
+        }
       },
       
       addElement: (element) => {
         const { currentWhiteboard } = get();
         if (!currentWhiteboard) return;
         
-        const newElements = [...currentWhiteboard.elements, element];
+        // Create a new array with the existing elements and the new one
+        const newElements = [...(currentWhiteboard.elements || []), element];
         
         set((state) => {
+          // Update the whiteboard with the new elements
           const updatedWhiteboard = {
             ...state.currentWhiteboard!,
             elements: newElements,
@@ -115,12 +119,13 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
           };
         });
         
+        // Save this state to history for undo/redo
         get().saveToHistory();
       },
       
       updateElement: (id, updates) => {
         const { currentWhiteboard } = get();
-        if (!currentWhiteboard) return;
+        if (!currentWhiteboard || !currentWhiteboard.elements) return;
         
         const newElements = currentWhiteboard.elements.map(el => 
           el.id === id ? { ...el, ...updates } : el
@@ -146,7 +151,7 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
       
       deleteElement: (id) => {
         const { currentWhiteboard } = get();
-        if (!currentWhiteboard) return;
+        if (!currentWhiteboard || !currentWhiteboard.elements) return;
         
         const newElements = currentWhiteboard.elements.filter(el => el.id !== id);
         
@@ -198,7 +203,7 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
         const newHistory = history.slice(0, historyIndex + 1);
         
         // Add current state to history
-        newHistory.push([...currentWhiteboard.elements]);
+        newHistory.push([...(currentWhiteboard.elements || [])]);
         
         set({
           history: newHistory,
@@ -211,7 +216,7 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
         if (!currentWhiteboard || historyIndex <= 0) return;
         
         const newIndex = historyIndex - 1;
-        const elements = history[newIndex];
+        const elements = history[newIndex] || [];
         
         set((state) => {
           const updatedWhiteboard = {
@@ -235,7 +240,7 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
         if (!currentWhiteboard || historyIndex >= history.length - 1) return;
         
         const newIndex = historyIndex + 1;
-        const elements = history[newIndex];
+        const elements = history[newIndex] || [];
         
         set((state) => {
           const updatedWhiteboard = {
@@ -256,6 +261,8 @@ export const useWhiteboardStore = create<WhiteboardStore>()(
     }),
     {
       name: 'whiteboard-storage',
+      // Only persist the whiteboards array, not the current state
+      partialize: (state) => ({ whiteboards: state.whiteboards }),
     }
   )
 );
