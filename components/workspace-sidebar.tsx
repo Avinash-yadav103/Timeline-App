@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Calendar, Plus, Search, User, Settings, Moon, Sun, FileText, Kanban, Layout, Clock } from "lucide-react"
+import { Calendar, Plus, Search, User, Settings, Moon, Sun, FileText, Kanban, Layout, Clock, Target } from "lucide-react"
 import { useTheme } from "@/context/theme-context"
 import { useWorkspace } from "@/hooks/use-workspace"
 import { Button } from "@/components/ui/button"
@@ -113,6 +113,15 @@ export function WorkspaceSidebar() {
                 >
                   <Kanban className="h-4 w-4" />
                   <span>Whiteboard</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  active={currentView === "goals"}
+                  onClick={() => setCurrentView("goals")}
+                >
+                  <Target className="h-4 w-4" />
+                  <span>Goals Tracker</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

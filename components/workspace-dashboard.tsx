@@ -11,6 +11,8 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { CalendarProvider } from "@/context/calendar-context"; // Add this import
+import { GoalsView } from "@/components/goals-view";
 
 // Create a wrapper component that uses the context hooks
 function WorkspaceDashboardContent() {
@@ -43,7 +45,11 @@ function WorkspaceDashboardContent() {
           </div>
         );
       case "calendar":
-        return <CalendarView />;
+        return (
+          <CalendarProvider>
+            <CalendarView />
+          </CalendarProvider>
+        );
       case "notes":
         return (
           <div className="flex h-full items-center justify-center">
@@ -76,6 +82,8 @@ function WorkspaceDashboardContent() {
             </div>
           </div>
         );
+      case "goals":
+        return <GoalsView />;
     }
   };
 

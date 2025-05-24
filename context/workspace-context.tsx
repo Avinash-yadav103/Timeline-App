@@ -10,7 +10,7 @@ interface WorkspaceContextType {
   notes: Note[]
   whiteboards: Whiteboard[]
   currentProject: string | null
-  currentView: "timeline" | "calendar" | "notes" | "whiteboard"
+  currentView: "timeline" | "calendar" | "notes" | "whiteboard" | "goals" // Add "goals" here
   getProject: (id: string) => Project | undefined
   getProjectTasks: (projectId: string) => TimelineItem[]
   addProject: (project: Omit<Project, "id">) => void
@@ -20,7 +20,7 @@ interface WorkspaceContextType {
   updateTask: (task: TimelineItem) => void
   deleteTask: (id: string) => void
   setCurrentProject: (id: string | null) => void
-  setCurrentView: (view: "timeline" | "calendar" | "notes" | "whiteboard") => void
+  setCurrentView: (view: "timeline" | "calendar" | "notes" | "whiteboard" | "goals") => void // Update this too
 }
 
 const WorkspaceContext = React.createContext<WorkspaceContextType | undefined>(undefined)
@@ -172,7 +172,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [notes, setNotes] = React.useState<Note[]>([])
   const [whiteboards, setWhiteboards] = React.useState<Whiteboard[]>([])
   const [currentProject, setCurrentProject] = React.useState<string | null>("1")
-  const [currentView, setCurrentView] = React.useState<"timeline" | "calendar" | "notes" | "whiteboard">("timeline")
+  const [currentView, setCurrentView] = React.useState<"timeline" | "calendar" | "notes" | "whiteboard" | "goals">("timeline")
   
   const getProject = (id: string) => {
     return projects.find(project => project.id === id)
