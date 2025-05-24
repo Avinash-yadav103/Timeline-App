@@ -346,7 +346,11 @@ function GoalModal({
                       <Label className="text-sm font-medium mb-1.5 block">Status</Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {goal.status && 
                             <>
                               <span className={`w-2 h-2 rounded-full mr-2 ${statusOptions.find(s => s.value === goal.status)?.color || "bg-gray-500"}`} />
@@ -356,7 +360,7 @@ function GoalModal({
                             {!goal.status && "Select status"}
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
+                        <DropdownMenuContent className="w-56" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenuRadioGroup value={goal.status} onValueChange={(value) => setGoal({ ...goal, status: value as GoalStatus })}>
                             {statusOptions.map((option) => (
                               <DropdownMenuRadioItem key={option.value} value={option.value} className="flex items-center gap-2">
@@ -375,7 +379,11 @@ function GoalModal({
                       <Label className="text-sm font-medium mb-1.5 block">Priority</Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {goal.priority && 
                             <>
                               <span className={`w-2 h-2 rounded-full mr-2 ${priorityOptions.find(p => p.value === goal.priority)?.color || ""}`} />
@@ -385,7 +393,7 @@ function GoalModal({
                             {!goal.priority && "Select priority"}
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
+                        <DropdownMenuContent className="w-56" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenuRadioGroup value={goal.priority} onValueChange={(value) => setGoal({ ...goal, priority: value })}>
                             {priorityOptions.map((option) => (
                               <DropdownMenuRadioItem 
@@ -407,12 +415,16 @@ function GoalModal({
                       <Label className="text-sm font-medium mb-1.5 block">Team</Label>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {goal.team && teamOptions.find(t => t.value === goal.team)?.label}
                             {!goal.team && "Select team"}
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
+                        <DropdownMenuContent className="w-56" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenuRadioGroup value={goal.team} onValueChange={(value) => setGoal({ ...goal, team: value })}>
                             {teamOptions.map((option) => (
                               <DropdownMenuRadioItem 
@@ -511,12 +523,13 @@ function GoalModal({
                             "w-full justify-start text-left font-normal",
                             !goal.dueDate && "text-muted-foreground"
                           )}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {goal.dueDate ? format(goal.dueDate, "PPP") : <span>Pick a date</span>}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
+                      <PopoverContent className="w-auto p-0" onClick={(e) => e.stopPropagation()}>
                         <CalendarComponent
                           mode="single"
                           selected={goal.dueDate}
@@ -531,7 +544,11 @@ function GoalModal({
                     <Label className="text-sm font-medium mb-1.5 block">Goal period</Label>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {goal.period === "daily" && "Daily"}
                           {goal.period === "weekly" && "Weekly"}
                           {goal.period === "monthly" && "Monthly"}
@@ -540,7 +557,7 @@ function GoalModal({
                           {!goal.period && "Select period"}
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
+                      <DropdownMenuContent className="w-56" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenuRadioGroup value={goal.period} onValueChange={(value) => setGoal({ ...goal, period: value as GoalPeriod })}>
                           <DropdownMenuRadioItem value="daily">Daily</DropdownMenuRadioItem>
                           <DropdownMenuRadioItem value="weekly">Weekly</DropdownMenuRadioItem>
@@ -592,7 +609,7 @@ function GoalModal({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!goal.name}>
+          <Button onClick={handleSave}>
             {initialGoal?.id ? "Save changes" : "Create goal"}
           </Button>
         </div>
@@ -633,8 +650,8 @@ export function GoalsView() {
       // Add new goal
       const newGoal: Goal = {
         id: Math.random().toString(36).substring(2),
-        name: goalData.name || "Untitled Goal",
-        description: goalData.description,
+        name: goalData.name || "Untitled Goal",  // Default to "Untitled Goal" if name is empty
+        description: goalData.description || "",
         owner: goalData.owner || "",
         status: goalData.status || "not-started",
         dueDate: goalData.dueDate || new Date(),
